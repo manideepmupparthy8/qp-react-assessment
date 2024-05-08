@@ -1,26 +1,64 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload...
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+interface TodoItem {
+  id: number;
+  text: string;
+  completed: boolean;
 }
 
-export default App;
+  export default function App() {
+
+  const [inputValue, setInputValue] = useState<string>('');
+  const [todos, setTodos] = useState<TodoItem[]>([]);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleAddTodo = () => {
+    if (inputValue.trim() === '') return;
+    const newTodo: TodoItem = {
+      id: todos.length + 1,
+      text: inputValue,
+      completed: false,
+    };
+    setTodos([...todos, newTodo]);
+    setInputValue('');
+  };
+
+  const toggleTodoCompletion = (id: number) => {
+    const updatedTodos = todos.map(todo =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+    setTodos(updatedTodos);
+  };
+
+  return (
+    <div className="todo-container">
+      <h1>Todo List</h1>
+      <div className="add-todo">
+        <input
+          type="text"
+          placeholder="Add a new todo..."
+          value={inputValue}
+          onChange={handleInputChange}
+        />
+        <button onClick={handleAddTodo}>Add Todo</button>
+      </div>
+      <ul className="todo-list">
+        {todos.map(todo => (
+          <li key={todo.id} className={todo.completed ? 'completed' : ''}>
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() => toggleTodoCompletion(todo.id)}
+              data-testid={'todo-checkbox'}
+            />
+            <span>{todo.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
